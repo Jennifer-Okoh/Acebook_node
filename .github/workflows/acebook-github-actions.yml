@@ -68,9 +68,9 @@ jobs:
       run: |
           aws deploy create-deployment \
             --application-name jens-acebook \
-            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name jens-acebook-production \
-            --s3-location bucket=jens-acebook-bucket,key=my_acebook_proj.zip,bundleType=zip
+            --s3-location bucket=jens-acebook-bucket,key=my_acebook_project.zip,bundleType=zip
 
     # - name: Stop server
     #   run: kill $(lsof -t -i:3030)
