@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI/CD
 
 on:
   push:
@@ -44,5 +44,33 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Stop server
-      run: kill $(lsof -t -i:3030)
+    - name: Package Application
+      run: zip -r my_acebook_project.zip .
+    
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with: 
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-2
+    
+    - name: Upload deployment artifacts to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws s3 cp my_acebook_proj.zip s3://jens-acebook-bucket/my_acebook_proj.zip
+        
+    - name: Deploy with CodeDeploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+          aws deploy create-deployment \
+            --application-name jens-acebook \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name jens-acebook-production \
+            --s3-location bucket=jens-acebook-bucket,key=my_acebook_proj.zip,bundleType=zip
+
+    # - name: Stop server
+    #   run: kill $(lsof -t -i:3030)
