@@ -55,16 +55,10 @@ jobs:
         aws-region: eu-west-2
     
     - name: Upload deployment artifacts to S3
-      # env:
-      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         aws s3 cp my_acebook_project.zip s3://jens-acebook-bucket/my_acebook_project.zip
 
     - name: Deploy with CodeDeploy
-      # env:
-      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
           aws deploy create-deployment \
             --application-name jens-acebook \
@@ -72,5 +66,3 @@ jobs:
             --deployment-group-name jens-acebook-production \
             --s3-location bucket=jens-acebook-bucket,key=my_acebook_project.zip,bundleType=zip
 
-    # - name: Stop server
-    #   run: kill $(lsof -t -i:3030)
